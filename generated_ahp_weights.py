@@ -1,9 +1,3 @@
-"""
-AUTO-GENERATED FILE — do not edit by hand.
-Produced by run_generate_ahp_weights.py (seed=42).
-Weights replace EXPERT_WEIGHTS_CRITERIA when imported by start_calculations.
-"""
-
 from __future__ import annotations
 
 CATEGORIES: tuple[str, ...] = ('criminal', 'financial', 'professional', 'psychological', 'reputational', 'behavioral', 'ideological')
