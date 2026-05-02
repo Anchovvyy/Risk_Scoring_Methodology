@@ -1,10 +1,5 @@
 """
 Global calculations for risk methodology:
-
-- hardcoded expert criteria weights.
-- x95 thresholds from generated population.
-- deterministic OSINT feature generation (left-skewed Beta, not uniform).
-- information assets and their impact levels.
 """
 
 from __future__ import annotations
