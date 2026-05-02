@@ -1,16 +1,4 @@
-"""
-Однократный запуск этапа 3 (МАИ): генерация матрицы Саати, весов, CI/CR.
-
-Не входит в основной пайплайн. Результат — файлы:
-- generated_ahp_weights.py  (импортируется в start_calculations)
-- generated_ahp_weights.json (для просмотра)
-
-Пример:
-    python run_generate_ahp_weights.py --seed 42
-"""
-
 from __future__ import annotations
-
 import argparse
 import json
 import random
