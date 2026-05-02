@@ -103,10 +103,6 @@ def normalize_weights(weights: Mapping[str, float]) -> Dict[str, float]:
 
 
 def resolve_weights_criteria() -> tuple[Dict[str, float], Optional[Dict[str, Any]]]:
-    """
-    Веса этапа 3: если существует `generated_ahp_weights.py` (однократный МАИ-прогон),
-    берём оттуда WEIGHTS_CRITERIA и AHP_REPORT; иначе — EXPERT_WEIGHTS_CRITERIA.
-    """
     try:
         from generated_ahp_weights import AHP_REPORT, WEIGHTS_CRITERIA
 
@@ -152,7 +148,6 @@ def build_global_calculation_bundle(
 
 
 def random_osint_metric(rng: random.Random | None = None) -> float:
-    """Single OSINT score in [0, 1], skewed toward low values (left-skewed Beta)."""
     generator = rng if rng is not None else random
     return round(generator.betavariate(OSINT_BETA_ALPHA, OSINT_BETA_BETA), 4)
 
