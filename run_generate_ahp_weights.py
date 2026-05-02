@@ -9,18 +9,7 @@ THIS_DIR = Path(__file__).resolve().parent
 if str(THIS_DIR) not in sys.path:
     sys.path.insert(0, str(THIS_DIR))
 
-from start_calculations import DEFAULT_OSINT_CATEGORIES  # noqa: E402
-#from stage3_ahp import format_generated_python_module, generate_ahp_bundle  # noqa: E402
-
-"""
-Stage 3 (МАИ / AHP): построение матрицы парных сравнений по шкале Саати,
-случайное «реалистичное» ослабление согласованности с сохранением a_ji = 1/a_ij,
-расчёт весов (собственный вектор), λ_max, CI, CR.
-
-вызывается отдельным скриптом.
-"""
-
-#from __future__ import annotations
+from start_calculations import DEFAULT_OSINT_CATEGORIES  
 import random
 from bisect import bisect_left
 from typing import Any, Dict, List, Sequence, Tuple
@@ -74,7 +63,6 @@ def _build_perfectly_consistent_matrix(priorities: Sequence[float]) -> np.ndarra
 
 
 def _discretize_upper_triangle(matrix: np.ndarray) -> np.ndarray:
-    """Верхний треугольник (i<j): проекция на ближайшее значение шкалы Саати, диагональ 1."""
     n = matrix.shape[0]
     out = np.eye(n, dtype=float)
     for i in range(n):
@@ -85,7 +73,6 @@ def _discretize_upper_triangle(matrix: np.ndarray) -> np.ndarray:
 
 
 def _adjacent_scale_ratios(rng: random.Random) -> List[float]:
-    """Множители «на шаг по шкале» вверх/вниз: s_{k+1}/s_k или s_k/s_{k+1}."""
     ratios: List[float] = []
     for k in range(len(SAATY_SCALE) - 1):
         a, b = SAATY_SCALE[k], SAATY_SCALE[k + 1]
@@ -102,11 +89,6 @@ def perturb_reciprocal_matrix(
     perturbation_probability: float = 0.35,
     perturbations_max: int | None = None,
 ) -> Tuple[np.ndarray, int]:
-    """
-    Случайно ослабляет согласованность: для части пар (i<j) умножает a_ij
-    на отношение двух соседних значений шкалы, затем снова проецирует на Saaty.
-    Симметрия обратности сохраняется: a_ji = 1 / a_ij.
-    """
     n = matrix.shape[0]
     out = np.array(matrix, dtype=float, copy=True)
     ratios = _adjacent_scale_ratios(rng)
@@ -133,7 +115,6 @@ def perturb_reciprocal_matrix(
 
 
 def principal_eigenvector_weights(matrix: np.ndarray) -> Tuple[np.ndarray, float]:
-    """Главный собственный вектор (положительная часть), нормализация в сумму 1; λ_max."""
     eigenvalues, eigenvectors = np.linalg.eig(matrix)
     max_idx = int(np.argmax(eigenvalues.real))
     lambda_max = float(eigenvalues[max_idx].real)
@@ -161,12 +142,6 @@ def generate_ahp_bundle(
     max_resamples: int = 80,
     cr_threshold: float = 0.12,
 ) -> Dict[str, Any]:
-    """
-    Полный цикл: идеальная матрица из случайных приоритетов → дискретизация Saaty
-    → случайные возмущения с сохранением обратности → веса и CR.
-
-    Если CR слишком велик, повторяет генерацию (до max_resamples).
-    """
     categories = tuple(category_order)
     n = len(categories)
     last_report: Dict[str, Any] = {}
@@ -216,7 +191,6 @@ def generate_ahp_bundle(
 
 
 def format_generated_python_module(bundle: Dict[str, Any], seed: int) -> str:
-    """Текст модуля для записи в generated_ahp_weights.py"""
     import json as _json
 
     matrix = bundle["pairwise_matrix"]
@@ -238,7 +212,6 @@ def format_generated_python_module(bundle: Dict[str, Any], seed: int) -> str:
         "",
         "WEIGHTS_CRITERIA: dict[str, float] = " + _json.dumps(weights, indent=4, ensure_ascii=False),
         "",
-        # json.dumps даёт true/false — в .py нужен валидный Python; repr сохраняет True/False.
         "AHP_REPORT: dict = " + repr(report),
         "",
     ]
